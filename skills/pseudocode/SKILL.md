@@ -113,10 +113,9 @@ function main() {
 ### Stage 1 completion criterion (review gate)
 Stage 1 is complete when every file the task needs exists and every piece of logic and branching is written as indented single-line comments. Stage 1 files are incomplete drafts and need not compile or pass syntax/lint checks (e.g., indentation-sensitive languages or unused imports/variables), so skip build, typecheck, and linter runs during Stage 1. Then:
 
-1. List the created and modified files (as a directory tree when spanning multiple folders).
-2. Highlight assumptions or logic choices most likely to differ from the user's mental model.
-3. Invite the user to edit the pseudocode comments directly in the files or reply with adjustments.
-4. Wait. Stage 2 starts only on the user's explicit go-ahead.
+1. Highlight assumptions or logic choices most likely to differ from the user's mental model.
+2. End the response with a **clickable file summary** grouped by folder (as a nested Markdown list, outside any code fence) where every created or modified file is a clickable link (`[path/to/file](file:///absolute/path/to/file)`) with a brief one-line note of its role, so the user can click straight into each file to review and edit.
+3. Invite the user to edit the pseudocode comments directly in the files or reply with adjustments, then wait. Stage 2 starts only on the user's explicit go-ahead.
 
 ### Review iterations
 When the user replies with adjustments or indicates they edited the files, re-read the affected files first—the user's edited comments, wording, indentation, and any code they wrote directly are the source of truth. If more Stage 1 changes were requested in chat, update the comments accordingly and pause at the review gate again until the user approves for implementation.
