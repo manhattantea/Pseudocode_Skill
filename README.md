@@ -1,6 +1,6 @@
 # `/pseudocode` — Two-Stage Comment-First Coding Skill
 
-It's a langauge agnostic skill to help you write complex state logic and refine/review complex logical states and such without going through many refinements states through many queries. Suppose you asked for a transaction system but the model forgot a step or misunderstood something, you can refine it from the get go and be in the loop while also being familiar with your codebase. This can also span across many files and so on.
+It's a langauge agnostic skill to help you write complex state logic and refine/review complex logical states and such by going through less expensive refinement steps, and maintain a history of changes in .pseudocode folder for future reference. Suppose you asked for a transaction system but the model forgot a step or misunderstood something, you can refine it from the get go and be in the loop while also being familiar with your codebase. This can also span across many files and so on.
 
 
 1. **Stage 1 (Scaffold & Single-Line Logic Comments)**: Writes ~10% structural scaffolding (folders, files, types, function signatures, outer loop headers) and ~90% plain-language single-line comments representing every branch, check, and operation. Execution pauses here so you can review and tweak the comments (or add code yourself) to match your mental model.
@@ -22,10 +22,11 @@ Once installed, invoke it with `/pseudocode` or by asking for `"pseudocode mode"
 
 ## Key Rules
 
-- **~10% Code / ~90% Comments** As a soft rule:  Files, types, function signatures, and outer loop headers (`for`, `while`) are written as code; all logic and branching (`if`/`else`, `switch`/`match`, error checks, early returns) are written as single-line comments.
+- **~10% Code / ~90% Comments (for new work)**: On new files and functions, types, function signatures, and outer loop headers (`for`, `while`) are written as code while all new logic and branching (`if`/`else`, `switch`/`match`, error checks, early returns) are written as single-line comments.
+- **Non-Destructive on Existing Code**: Running `/pseudocode` on existing files let's you refine and improve without deleting existing code.
 - **Tab Indentation Shows Scope**: Nested branches and blocks indent one level deeper before the comment token (`//`, `#`, `--`), acting like braces so scope is clear at a glance.
 - **Plain-Language Logic**: Comments describe *what happens* in readable prose (`// if response status is 200 OK`), not raw syntax (`// if (res.status == 200)`).
-- **Multi-File Aware**: Creates full folder/file trees when needed and encourages naming scaffolded functions across files (`// call auth.verify_token on request header`).
+- **Multi-File Aware + Clickable Review Summary**: Creates full folder/file trees when needed, names scaffolded functions across files (`// call auth.verify_token on request header`), and ends Stage 1 with clickable file/line links to every `[NEW]` and `[MODIFIED]` section.
 
 ---
 
@@ -120,4 +121,16 @@ func ProcessQueue(queue <-chan WebhookEvent, upstreamURL string) {
 }
 ```
 
-At this point **Stage 1 stops**. You can directly edit any comment line (for example, changing `less than 3` retries to `5`, or changing the queue-full behavior) and tell the agent to proceed to **Stage 2**.
+At this point **Stage 1 stops**. You can directly edit any comment line like for example.
+
+```
+// if upstream returned 4xx client error
+	// do not retry; log permanent rejection for event.ID
+
+Changed to:
+
+// if upstream returned 4xx client error
+	// do not retry; log permanent rejection for event.ID and shutdown entire process immediately
+```
+
+and tell the agent to proceed to **Stage 2** to implement it.
