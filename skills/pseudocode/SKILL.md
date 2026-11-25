@@ -4,8 +4,9 @@ description: >-
   Two-stage comment-first coding workflow: Stage 1 writes ~10% minimal scaffolding
   and ~90% indented single-line logic comments for new or changed logic while keeping
   existing working code intact; the user reviews and edits that pseudocode in place;
-  Stage 2 snapshots to .pseudocode/ and implements it. Use for /pseudocode,
-  "pseudocode mode", or staged comment-first implementation and refactoring.
+  Stage 2 implements it, checkpointing via Git commits (or .pseudocode/ shell copy
+  fallback). Use for /pseudocode, "pseudocode mode", or staged comment-first
+  implementation and refactoring.
 ---
 
 # Pseudocode (Two-Stage Comment-First Coding)
@@ -128,9 +129,10 @@ function main() {
 ### Stage 1 completion criterion (review gate)
 Stage 1 is complete when every new or modified file has the requested changes expressed as indented single-line comments while all unrelated existing code remains intact. Stage 1 files are incomplete drafts and need not compile or pass syntax/lint checks (e.g., indentation-sensitive blocks or unused imports/variables), so skip build, typecheck, and linter runs during Stage 1. Then:
 
-1. Highlight assumptions or logic choices most likely to differ from the user's mental model.
-2. End the response with a **clickable file summary** grouped by folder (as a nested Markdown list, outside any code fence) where every created or modified file is a clickable link (`[path/to/file](file:///absolute/path/to/file)` or `#Lstart-Lend` for specific modified sections in existing files), marked `[NEW]` or `[MODIFIED]` with a brief one-line note of what changed, so the user can jump straight to each pseudocode block.
-3. Invite the user to edit the pseudocode comments directly in the files or reply with adjustments, then wait. Stage 2 starts only on the user's explicit go-ahead.
+1. **Checkpoint Stage 1**: Commit only the touched files (`git add <touched-files...> && git commit --no-verify -m "pseudocode(stage1): <short-summary>"`). If not a Git repo or `git commit` fails/is disallowed, fall back to copying only the touched files via a shell copy command (never LLM file writes, to save tokens) into `<project-root>/.pseudocode/<NNN>_<name>/` preserving relative paths (e.g., `cp --parents <touched-files...> .pseudocode/000_<slug>/`, where `<NNN>` increments from `000`). Skip if the user asked for no backup.
+2. Highlight assumptions or logic choices most likely to differ from the user's mental model.
+3. End the response with a **clickable file summary** grouped by folder (as a nested Markdown list, outside any code fence) where every created or modified file is a clickable link (`[path/to/file](file:///absolute/path/to/file)` or `#Lstart-Lend` for specific modified sections in existing files), marked `[NEW]` or `[MODIFIED]` with a brief one-line note of what changed, so the user can jump straight to each pseudocode block.
+4. Invite the user to edit the pseudocode comments directly in the files or reply with adjustments, then wait. Stage 2 starts only on the user's explicit go-ahead.
 
 ### Review iterations
 When the user replies with adjustments or indicates they edited the files, re-read the affected files first—the user's edited comments, wording, indentation, and any code they wrote directly are the source of truth. If more Stage 1 changes were requested in chat, update only the relevant comments accordingly and pause at the review gate again until the user approves for implementation.
@@ -140,7 +142,7 @@ When the user replies with adjustments or indicates they edited the files, re-re
 ## Stage 2: Implementation (post-approval)
 
 1. **Re-read** all touched Stage 1 files so any direct user edits to the comments or code are captured.
-2. **Snapshot to `.pseudocode/<NNN>_<name>/`**: Before replacing any comments, copy only the files touched in this task into `<project-root>/.pseudocode/<NNN>_<name>/`, preserving each file's relative folder path from the workspace/repository root (e.g., `cp --parents <touched-files...> .pseudocode/001_streamline_login/`). `<NNN>` is a 3-digit counter starting at `000` and incrementing by 1 (`001`, `002`, ...) from the highest existing folder in `.pseudocode/`, and `<name>` is a short slug you pick for the task. Skip only if the user explicitly asked for no backup.
+2. **Checkpoint Stage 2 (before editing)**: Commit the reviewed Stage 1 files if anything changed since Stage 1 (`git add <touched-files...> && git commit --no-verify -m "pseudocode(stage2): <short-summary>"`). If not a Git repo or `git commit` fails/is disallowed, fall back to copying only the touched files via a shell copy command (`cp --parents <touched-files...> .pseudocode/<NNN>_<name>/`, incrementing `<NNN>` from `000`) so zero LLM output tokens are spent. Skip if the user asked for no backup.
 3. **Replace Stage 1 comments in place** with working code in the target language, matching the logic and indentation scope of the reviewed comments:
    - Leave all pre-existing working code, pre-existing doc/explanatory comments, and any real code the user added during review intact, adapting the newly generated code around them to fit existing variables, types, and signatures.
    - Resolve cross-file function names to their actual signatures.

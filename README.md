@@ -3,8 +3,8 @@
 It's a langauge agnostic skill to help you write complex state logic and refine/review complex logical states and such by going through less expensive refinement steps, and maintain a history of changes in .pseudocode folder for future reference. Suppose you asked for a transaction system but the model forgot a step or misunderstood something, you can refine it from the get go and be in the loop while also being familiar with your codebase. This can also span across many files and so on.
 
 
-1. **Stage 1 (Scaffold & Single-Line Logic Comments)**: Writes ~10% structural scaffolding (folders, files, types, function signatures, outer loop headers) and ~90% plain-language single-line comments representing every branch, check, and operation. Execution pauses here so you can review and tweak the comments (or add code yourself) to match your mental model.
-2. **Stage 2 (Post-Review Snapshot & Implementation)**: After you approve, the agent re-reads your edits, snapshots the touched Stage 1 files (preserving their relative folder path) into `.pseudocode/<NNN>_<name>/` (`000_...`, `001_...`, etc.), and replaces the comments in place with working code while keeping any code you wrote during review intact.
+1. **Stage 1 (Scaffold & Single-Line Logic Comments)**: Writes ~10% structural scaffolding (folders, files, types, function signatures, outer loop headers) and ~90% plain-language single-line comments representing every branch, check, and operation, then checkpoints the draft via a Git commit (or a shell copy to `.pseudocode/<NNN>_<name>/` if Git is unavailable). Execution pauses here so you can review and tweak the comments (or add code yourself) to match your mental model.
+2. **Stage 2 (Post-Review Checkpoint & Implementation)**: After you approve, the agent re-reads your edits, checkpoints the reviewed Stage 1 files via Git (or `.pseudocode/` fallback via `cp`), and replaces the comments in place with working code while keeping any code you wrote during review intact.
 
 ---
 
